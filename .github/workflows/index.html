@@ -1,4 +1,19 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+</head>
+<body> 
+    <center>  <img id="carlGif" src="Carl2.gif" alt="Carl1.gif" /></center>
 
+
+    <h1>CARL</h1>
+    <h3><center>Communicating Advanced Responding Language model<h/3>
+    <p>This page will listen to your voice commands and perform actions when the wake word "Carl" is detected.</p>
+    <p id="output"></p>
+
+    <script>
   
         
          const output = document.getElementById('output');
@@ -120,6 +135,12 @@
                 listening = false;
                 recognition.start();
             });
+             const Spanish = /(spanish|translate|)\b/i.test(result);
+
+                    if (Spanish) {
+                        // Open a new tab and perform a Google search
+                        window.open(`https://www.spanishdict.com/translate/(result)`, '_blank');
+                    }
         } else {
             output.textContent = 'Speech recognition is not supported in this browser.';
         }
@@ -160,3 +181,51 @@
             const googleMapsURL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location)}`;
             window.open(googleMapsURL, '_blank');
         }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        h3 {
+            font-size: 16px;
+            color: #666;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        #output {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 80%;
+            margin: 20px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+    </style>
+</body>
+</html>
