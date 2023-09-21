@@ -135,8 +135,12 @@
                 listening = false;
                 recognition.start();
             });
-            
-           
+             const Spanish = /(spanish|translate|)\b/i.test(result);
+
+                    if (Spanish) {
+                        // Open a new tab and perform a Google search
+                        window.open(`https://www.spanishdict.com/translate/(result)`, '_blank');
+                    }
         } else {
             output.textContent = 'Speech recognition is not supported in this browser.';
         }
