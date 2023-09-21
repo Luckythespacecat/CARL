@@ -16,9 +16,6 @@
     <script>
   
         
-        
-  
-        
          const output = document.getElementById('output');
         let listening = false;
         let timerId;
@@ -46,13 +43,6 @@
                 output.textContent = 'Listening...';
                  changeGif();
             };
-  // Check if the recognized text is a question
-                    const isQuestion = /(who|what|where|when|why|how)\b/i.test(result);
-
-                    if (isQuestion) {
-                        // Open a new tab and perform a Google search
-                        window.open(`https://www.google.com/search?q=${encodeURIComponent(result)}`, '_blank');
-                    }
 
             recognition.onend = () => {
                 if (listening) {
@@ -145,6 +135,8 @@
                 listening = false;
                 recognition.start();
             });
+            
+           
         } else {
             output.textContent = 'Speech recognition is not supported in this browser.';
         }
@@ -185,6 +177,51 @@
             const googleMapsURL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location)}`;
             window.open(googleMapsURL, '_blank');
         }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        h3 {
+            font-size: 16px;
+            color: #666;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        #output {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 80%;
+            margin: 20px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        
     </style>
 </body>
 </html>
