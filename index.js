@@ -1,9 +1,22 @@
-  const output = document.getElementById('output');
+
+  
+        
+         const output = document.getElementById('output');
         let listening = false;
         let timerId;
         let lastSpeechTimestamp = 0;
         const speechTimeout = 1500; // 1.5 seconds
 
+        const gifElement = document.getElementById('carlGif');
+        const gifs = ["Carl2.gif", "Carl1.gif"];
+        let currentGifIndex = 1; // Start with "Carl1.gif"
+
+        function changeGif() {
+            gifElement.src = gifs[currentGifIndex];
+            currentGifIndex = (currentGifIndex + 1) % gifs.length; // Toggle between 0 and 1
+        }
+
+        
         // Check if the browser supports speech recognition
         if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -13,6 +26,7 @@
 
             recognition.onstart = () => {
                 output.textContent = 'Listening...';
+                 changeGif();
             };
 
             recognition.onend = () => {
@@ -37,7 +51,7 @@
                     lastSpeechTimestamp = new Date().getTime();
 
                     // Check if the recognized text is a question
-                    const isQuestion = /(who|what|where|why|how)\b/i.test(result);
+                    const isQuestion = /(who|what|where|when|why|how)\b/i.test(result);
 
                     if (isQuestion) {
                         // Open a new tab and perform a Google search
@@ -84,15 +98,21 @@
                     if (/carl/i.test(result)) {
                         output.textContent = 'Carl: Listening...';
                         listening = true;
+                         changeGif();
                         recognition.start();
+                         currentGifIndex = (currentGifIndex + 1) % gifs.length;
+            gifElement.src = gifs[currentGifIndex]; 
                     }
                 }
             };
 
-            recognition.onerror = (event) => {
-                output.textContent = 'Error occurred. Please try again.';
-                console.error(event.error);
-            };
+                recognition.onerror = (event) => {
+            output.textContent = 'Error occurred. Please try again.';
+            console.error(event.error);
+             changeGif();
+             currentGifIndex = (currentGifIndex + 1) % gifs.length;
+            gifElement.src = gifs[currentGifIndex];
+        };
 
             // Start continuous recognition when the page loads
             window.addEventListener('load', () => {
@@ -132,6 +152,7 @@
         function resetRecognition() {
             listening = false;
             output.textContent = 'Waiting for wake word "Carl"...';
+            changeGif();
         }
 
         // Function to open Google Maps with directions to a location
