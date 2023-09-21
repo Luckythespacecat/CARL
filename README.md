@@ -1,4 +1,5 @@
-# Luckythespacecat.github.io
+# Luckythespacecat.github.io 
+!!MAKE SURE POP UPS ARENT BLOCKED!!
 This is CARL the Communication Advanced Responding Language model
 Carl uses speech recognition to open websites, search questions and find locations.
 Carl has the ability to look up questions that are asked, when the sentece "who,what,where,when,why or how" is included.
