@@ -43,32 +43,8 @@
                 output.textContent = 'Listening...';
                  changeGif();
             };
-       if (/in Spanish/i.test(result)) {
-                    const words = result.split(' ');
-                    const inSpanishIndex = words.findIndex(word => word.toLowerCase() === 'in' && words.indexOf(word) < words.length - 1);
-                    if (inSpanishIndex !== -1 && inSpanishIndex < words.length - 1) {
-                        const textToTranslate = words.slice(0, inSpanishIndex).join(' ');
-                        // Translate the text and open it in a new tab
-                        window.open(`https://www.spanishdict.com/translate/${encodeURIComponent(textToTranslate)}`, '_blank');
-                    }
-                }
-
-                // Check if the recognized text contains "translate"
-                if (/translate/i.test(result)) {
-                    const words = result.split(' ');
-                    const translateIndex = words.findIndex(word => word.toLowerCase() === 'translate' && words.indexOf(word) < words.length - 1);
-                    if (translateIndex !== -1 && translateIndex < words.length - 1) {
-                        const textToTranslate = words.slice(translateIndex + 1).join(' ');
-                        // Translate the text and open it in a new tab
-                        window.open(`https://www.spanishdict.com/translate/${encodeURIComponent(textToTranslate)}`, '_blank');
-                    }
-                }
-              const Spanish = /(in spanish|translate spanish|)\b/i.test(result);
-
-                    if (Spanish) {
-                        // Open a new tab and perform a Google search
-                        window.open(`https://www.spanishdict.com/translate/{encodeURIComponent(result)}`, '_blank');
-                    }
+      
+           
             recognition.onend = () => {
                 if (listening) {
                     const currentTime = new Date().getTime();
