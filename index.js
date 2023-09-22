@@ -1,7 +1,5 @@
-
-  
-        
-         const output = document.getElementById('output');
+    const output = document.getElementById('output');
+        const searchResultsContainer = document.getElementById('searchResults'); // Container for displaying search results
         let listening = false;
         let timerId;
         let lastSpeechTimestamp = 0;
@@ -16,7 +14,6 @@
             currentGifIndex = (currentGifIndex + 1) % gifs.length; // Toggle between 0 and 1
         }
 
-        
         // Check if the browser supports speech recognition
         if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -26,7 +23,7 @@
 
             recognition.onstart = () => {
                 output.textContent = 'Listening...';
-                 changeGif();
+                changeGif();
             };
 
             recognition.onend = () => {
@@ -43,7 +40,7 @@
                 }
             };
 
-            recognition.onresult = (event) => {
+            recognition.onresult = async (event) => {
                 const result = event.results[event.results.length - 1][0].transcript;
 
                 if (listening) {
@@ -54,8 +51,17 @@
                     const isQuestion = /(who|what|where|when|why|how)\b/i.test(result);
 
                     if (isQuestion) {
-                        // Open a new tab and perform a Google search
-                        window.open(`https://www.google.com/search?q=${encodeURIComponent(result)}`, '_blank');
+                        if (/whatis/i.test(result)) {
+                            // Do nothing because "what is" is mentioned
+                        } else {
+                            // Open a new tab and perform a Google search
+                            window.open(`https://www.google.com/search?q=${encodeURIComponent(result)}`, '_blank');
+                        }
+
+                        // Handle "Do nothing" command
+                        handlePhrase(/what is/i, () => {
+                            // Do nothing here, i.e., no action will be taken
+                        });
                     }
 
                     // Check if the recognized text contains "Open"
@@ -93,26 +99,52 @@
                             openGoogleMaps(location);
                         }
                     }
+
+                    // Check if the recognized text contains "Read from website"
+                    if (/read from website/i.test(result)) {
+                        const searchQuery = result.replace(/read from website/i, '').trim();
+                        const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+
+                        try {
+                            const searchResults = await fetchSearchResults(url);
+                            if (searchResults && searchResults.length > 0) {
+                                displaySearchResults(searchResults);
+                            } else {
+                                output.textContent = 'No search results found.';
+                            }
+                        } catch (error) {
+                            output.textContent = 'An error occurred while fetching search results.';
+                        }
+                    }
+                    
+                    // Check if the recognized text contains "translate"
+                    if (/translate/i.test(result)) {
+                        const textToTranslate = result.replace(/translate/i, '').trim();
+                        const url = `https://www.spanishdict.com/translate/${encodeURIComponent(textToTranslate)}`;
+                        
+                        // Open a new tab and perform a translation search
+                        window.open(url, '_blank');
+                    }
                 } else {
                     // Check if the wake word "Carl" is detected
                     if (/carl/i.test(result)) {
                         output.textContent = 'Carl: Listening...';
                         listening = true;
-                         changeGif();
+                        changeGif();
                         recognition.start();
-                         currentGifIndex = (currentGifIndex + 1) % gifs.length;
-            gifElement.src = gifs[currentGifIndex]; 
+                        currentGifIndex = (currentGifIndex + 1) % gifs.length;
+                        gifElement.src = gifs[currentGifIndex];
                     }
                 }
             };
 
-                recognition.onerror = (event) => {
-            output.textContent = 'Error occurred. Please try again.';
-            console.error(event.error);
-             changeGif();
-             currentGifIndex = (currentGifIndex + 1) % gifs.length;
-            gifElement.src = gifs[currentGifIndex];
-        };
+            recognition.onerror = (event) => {
+                output.textContent = 'Error occurred. Please try again.';
+                console.error(event.error);
+                changeGif();
+                currentGifIndex = (currentGifIndex + 1) % gifs.length;
+                gifElement.src = gifs[currentGifIndex];
+            };
 
             // Start continuous recognition when the page loads
             window.addEventListener('load', () => {
@@ -120,43 +152,81 @@
                 listening = false;
                 recognition.start();
             });
+
+            // Function to check if a string is a valid domain
+            function isValidDomain(domain) {
+                const pattern = /^(www\.)?([a-zA-Z0-9-]+\.)+([a-zA-Z]{2,})+$/;
+                return pattern.test(domain);
+            }
+
+            // Function to set a timer and play an alarm
+            function setTimer(minutes) {
+                clearTimeout(timerId);
+                output.textContent = `Timer set for ${minutes} minutes.`;
+                timerId = setTimeout(() => {
+                    output.textContent = 'Timer expired. Alarm!';
+                    playAlarm();
+                }, minutes * 60000); // Convert minutes to milliseconds
+            }
+
+            // Function to play an alarm sound (you can replace this with your desired sound)
+            function playAlarm() {
+                // Add code here to play an alarm sound (e.g., using the Web Audio API or an audio element)
+                // For example, you can use an HTML5 audio element like this:
+                const audio = new Audio('path-to-your-alarm-sound.mp3');
+                audio.play();
+            }
+
+            // Function to reset recognition and wait for the wake word
+            function resetRecognition() {
+                listening = false;
+                output.textContent = 'Waiting for wake word "Carl"...';
+                changeGif();
+            }
+
+            // Function to open Google Maps with directions to a location
+            function openGoogleMaps(location) {
+                const googleMapsURL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location)}`;
+                window.open(googleMapsURL, '_blank');
+            }
+
+            // Function to fetch search results from Google
+            async function fetchSearchResults(url) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const searchResults = [];
+
+                    const resultElements = doc.querySelectorAll('.tF2Cxc');
+                    resultElements.forEach((resultElement) => {
+                        const title = resultElement.querySelector('h3')?.textContent;
+                        if (title) {
+                            searchResults.push({ title });
+                        }
+                    });
+
+                    return searchResults;
+                } catch (error) {
+                    console.error(error);
+                    return [];
+                }
+            }
+
+            // Function to display search results in HTML
+            function displaySearchResults(results) {
+                searchResultsContainer.innerHTML = ''; // Clear previous results
+
+                results.forEach((result, index) => {
+                    const resultElement = document.createElement('div');
+                    resultElement.innerHTML = `<p>Result ${index + 1}: ${result.title}</p>`;
+                    searchResultsContainer.appendChild(resultElement);
+                });
+            }
         } else {
             output.textContent = 'Speech recognition is not supported in this browser.';
-        }
-
-        // Function to check if a string is a valid domain
-        function isValidDomain(domain) {
-            const pattern = /^(www\.)?([a-zA-Z0-9-]+\.)+([a-zA-Z]{2,})+$/;
-            return pattern.test(domain);
-        }
-
-        // Function to set a timer and play an alarm
-        function setTimer(minutes) {
-            clearTimeout(timerId);
-            output.textContent = `Timer set for ${minutes} minutes.`;
-            timerId = setTimeout(() => {
-                output.textContent = 'Timer expired. Alarm!';
-                playAlarm();
-            }, minutes * 60000); // Convert minutes to milliseconds
-        }
-
-        // Function to play an alarm sound (you can replace this with your desired sound)
-        function playAlarm() {
-            // Add code here to play an alarm sound (e.g., using the Web Audio API or an audio element)
-            // For example, you can use an HTML5 audio element like this:
-            const audio = new Audio('path-to-your-alarm-sound.mp3');
-            audio.play();
-        }
-
-        // Function to reset recognition and wait for the wake word
-        function resetRecognition() {
-            listening = false;
-            output.textContent = 'Waiting for wake word "Carl"...';
-            changeGif();
-        }
-
-        // Function to open Google Maps with directions to a location
-        function openGoogleMaps(location) {
-            const googleMapsURL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location)}`;
-            window.open(googleMapsURL, '_blank');
         }
