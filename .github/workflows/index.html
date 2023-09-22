@@ -12,9 +12,11 @@
     <h3><center>Communicating Advanced Responding Language model</h3>
     <p>This page will listen to your voice commands and perform actions when the wake word "Carl" is detected.</p>
     <p id="output"></p>
+    <div id="searchResults"></div> <!-- Added div to display search results -->
 
     <script>
         const output = document.getElementById('output');
+        const searchResultsContainer = document.getElementById('searchResults'); // Container for displaying search results
         let listening = false;
         let timerId;
         let lastSpeechTimestamp = 0;
@@ -123,13 +125,12 @@
                         try {
                             const searchResults = await fetchSearchResults(url);
                             if (searchResults && searchResults.length > 0) {
-                                const firstResult = searchResults[0];
-                                readAloud(firstResult.title);
+                                displaySearchResults(searchResults);
                             } else {
-                                readAloud('No search results found.');
+                                output.textContent = 'No search results found.';
                             }
                         } catch (error) {
-                            readAloud('An error occurred while fetching search results.');
+                            output.textContent = 'An error occurred while fetching search results.';
                         }
                     }
                 } else {
@@ -233,11 +234,15 @@
                 }
             }
 
-            // Function to read text aloud using text-to-speech
-            function readAloud(text) {
-                const speechSynthesis = window.speechSynthesis;
-                const utterance = new SpeechSynthesisUtterance(text);
-                speechSynthesis.speak(utterance);
+            // Function to display search results in HTML
+            function displaySearchResults(results) {
+                searchResultsContainer.innerHTML = ''; // Clear previous results
+
+                results.forEach((result, index) => {
+                    const resultElement = document.createElement('div');
+                    resultElement.innerHTML = `<p>Result ${index + 1}: ${result.title}</p>`;
+                    searchResultsContainer.appendChild(resultElement);
+                });
             }
         } else {
             output.textContent = 'Speech recognition is not supported in this browser.';
@@ -285,6 +290,13 @@
             max-width: 80%;
             margin: 20px;
             box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Added style for displaying search results */
+        #searchResults {
+            font-size: 16px;
+            max-width: 80%;
+            text-align: left;
         }
     </style>
 </body>
