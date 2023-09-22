@@ -31,6 +31,14 @@
             currentGifIndex = (currentGifIndex + 1) % gifs.length; // Toggle between 0 and 1
         }
 
+        // Show confirmation dialog when the user tries to leave the page
+        window.addEventListener('beforeunload', (event) => {
+            if (listening) {
+                event.preventDefault();
+                event.returnValue = ''; // Display a confirmation message
+            }
+        });
+
         // Check if the browser supports speech recognition
         if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
