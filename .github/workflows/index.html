@@ -73,6 +73,11 @@
                         window.open(`https://www.google.com/search?q=${encodeURIComponent(result)}`, '_blank');
                     }
 
+                     // Handle "Do nothing" command
+        handlePhrase(/what is/i, () => {
+            // Do nothing here, i.e., no action will be taken
+        });
+                    
                     // Check if the recognized text contains "Open"
                     if (/open/i.test(result)) {
                         const words = result.split(' ');
