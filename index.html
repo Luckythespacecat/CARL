@@ -9,7 +9,7 @@
     <center> <img id="carlGif" src="Carl2.gif" alt="Carl1.gif" /></center>
 
     <h1>CARL</h1>
-    <h3><center>Communicating Advanced Responding Language model</center></h3>
+    <h3><center>Communicating Advanced Responding Language model</h3>
     <p>This page will listen to your voice commands and perform actions when the wake word "Carl" is detected.</p>
     <p id="output"></p>
     <div id="searchResults"></div> <!-- Added div to display search results -->
@@ -64,9 +64,6 @@
                     }
                 }
             };
-
-            let botSpeaking = false; // Flag to track when the bot is speaking
-            let botResponse = null; // Store the bot's response
 
             recognition.onresult = async (event) => {
                 const result = event.results[event.results.length - 1][0].transcript;
@@ -162,15 +159,6 @@
                         recognition.start();
                         currentGifIndex = (currentGifIndex + 1) % gifs.length;
                         gifElement.src = gifs[currentGifIndex];
-                        
-                        // Request permission to show pop-ups
-                        if (Notification.permission !== 'granted') {
-                            Notification.requestPermission().then(permission => {
-                                if (permission === 'granted') {
-                                    console.log('Permission granted for notifications.');
-                                }
-                            });
-                        }
                     }
                 }
             };
@@ -182,6 +170,13 @@
                 currentGifIndex = (currentGifIndex + 1) % gifs.length;
                 gifElement.src = gifs[currentGifIndex];
             };
+
+            // Start continuous recognition when the page loads
+            window.addEventListener('load', () => {
+                output.textContent = 'Waiting for wake word "Carl"...';
+                listening = false;
+                recognition.start();
+            });
 
             // Function to check if a string is a valid domain
             function isValidDomain(domain) {
