@@ -174,7 +174,7 @@
             // Start continuous recognition when the page loads
             window.addEventListener('load', () => {
                 output.textContent = 'Waiting for wake word "Carl"...';
-                listening = true;
+                listening = false;
                 recognition.start();
             });
 
